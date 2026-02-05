@@ -2,55 +2,68 @@
 <html>
 <head>
     <title>Sales Analytics Dashboard</title>
+
+    <!-- CSS -->
     <link rel="stylesheet" href="/static/style.css">
+
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
+<body>
 
+<div class="navbar">
+    📊 Sales Analytics Dashboard
+    <a href="/docs">API Docs</a>
+</div>
 
+<div class="container">
 
-<script>
-async function loadDailySales() {
-    const res = await fetch("/sales/daily-trend");
-    const data = await res.json();
+<h2>Sales Overview</h2>
 
-    const labels = data.map(d => d.date);
-    const totals = data.map(d => d.revenue);
+<!-- Cards -->
+<div class="cards">
+    <div class="card">
+        <h3>Total Orders</h3>
+        <p id="orders">0</p>
+    </div>
 
-    new Chart(document.getElementById("dailySalesChart"), {
-        type: "line",
-        data: {
-            labels: labels,
-            datasets: [{
-                label: "Daily Sales",
-                data: totals
-            }]
-        }
-    });
-}
+    <div class="card">
+        <h3>Total Quantity</h3>
+        <p id="quantity">0</p>
+    </div>
 
-async function loadCategorySales() {
-    const res = await fetch("/sales/by-category");
-    const data = await res.json();
+    <div class="card">
+        <h3>Total Revenue</h3>
+        <p id="revenue">0</p>
+    </div>
+</div>
 
-    const labels = data.map(d => d.category);
-    const totals = data.map(d => d.revenue);
+<h2>Sales Analytics</h2>
 
-    new Chart(document.getElementById("categoryChart"), {
-        type: "bar",
-        data: {
-            labels: labels,
-            datasets: [{
-                label: "Revenue by Category",
-                data: totals
-            }]
-        }
-    });
-}
+<div class="chart-container">
+    <canvas id="dailySalesChart"></canvas>
+</div>
 
-loadDailySales();
-loadCategorySales();
-</script>
+<br>
+
+<div class="chart-container">
+    <canvas id="categoryChart"></canvas>
+</div>
+
+<h2>Quick Access</h2>
+
+<div class="grid">
+    <a href="/products" class="card">📦 Products</a>
+    <a href="/sales/summary" class="card">💰 Sales Summary</a>
+    <a href="/top-products" class="card">🏆 Top Products</a>
+    <a href="/sales/by-category" class="card">📊 Category Revenue</a>
+    <a href="/inventory/low-stock" class="card">⚠️ Low Stock</a>
+</div>
+
+</div>
+
+<!-- Scripts at bottom -->
 
 <script>
 async function loadSummary() {
@@ -62,59 +75,42 @@ async function loadSummary() {
     document.getElementById("revenue").innerText = data.total_revenue;
 }
 
+async function loadDailySales() {
+    const res = await fetch("/sales/daily-trend");
+    const data = await res.json();
+
+    new Chart(document.getElementById("dailySalesChart"), {
+        type: "line",
+        data: {
+            labels: data.map(d => d.date),
+            datasets: [{
+                label: "Daily Sales",
+                data: data.map(d => d.revenue)
+            }]
+        }
+    });
+}
+
+async function loadCategorySales() {
+    const res = await fetch("/sales/by-category");
+    const data = await res.json();
+
+    new Chart(document.getElementById("categoryChart"), {
+        type: "bar",
+        data: {
+            labels: data.map(d => d.category),
+            datasets: [{
+                label: "Revenue by Category",
+                data: data.map(d => d.revenue)
+            }]
+        }
+    });
+}
+
 loadSummary();
+loadDailySales();
+loadCategorySales();
 </script>
-
-
-
-<body>
-
-<div class="navbar">
-    📊 Sales Analytics Dashboard
-    <a href="/docs">API Docs</a>
-</div>
-
-<h2>Sales Overview</h2>
-
-<div style="display:flex; gap:20px; margin-bottom:30px;">
-    <div class="card"><h3>Total Orders</h3><p id="orders">0</p></div>
-    <div class="card"><h3>Total Quantity</h3><p id="quantity">0</p></div>
-    <div class="card"><h3>Total Revenue</h3><p id="revenue">0</p></div>
-</div>
-
-<div class="container">
-    <h2>Sales Analytics</h2>
-
-<canvas id="dailySalesChart" height="50"></canvas>
-
-<br><br>
-
-<canvas id="categoryChart" height="50"></canvas>
-
-    <div class="grid">
-
-        <a href="/products" class="card">
-            📦 Products
-        </a>
-
-        <a href="/sales/summary" class="card">
-            💰 Sales Summary
-        </a>
-
-        <a href="/top-products" class="card">
-            🏆 Top Products
-        </a>
-
-        <a href="/sales/by-category" class="card">
-            📊 Category Revenue
-        </a>
-
-        <a href="/inventory/low-stock" class="card">
-            ⚠️ Low Stock
-        </a>
-
-    </div>
-</div>
 
 </body>
 </html>
